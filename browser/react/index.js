@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, Route, hashHistory, IndexRedirect} from 'react-router';
+import {Router, Route, browserHistory, IndexRedirect} from 'react-router';
 
 import AlbumsContainer from './containers/AlbumsContainer';
 import AlbumContainer from './containers/AlbumContainer';
@@ -18,9 +18,9 @@ import axios from 'axios';
 import store from './store';
 import {receiveAlbums, getAlbumById} from './action-creators/albums';
 import {receiveArtists, getArtistById} from './action-creators/artists';
-import {receivePlaylists, getPlaylistById} from './action-creators/playlists';
+import {receivePlaylists, getPlaylistById, loadAllSongs} from './action-creators/playlists';
 import { Provider } from 'react-redux';
-import Stations from '../components/Stations';
+import StationsContainer from './containers/StationsContainer';
 
 const onAppEnter = function () {
 
@@ -38,6 +38,10 @@ const onAppEnter = function () {
 
 };
 
+const onStationsEnter = function(nextRouterState){
+  store.dispatch(loadAllSongs())
+}
+
 const onAlbumEnter = function (nextRouterState) {
   const albumId = nextRouterState.params.albumId;
   store.dispatch(getAlbumById(albumId));
@@ -53,11 +57,11 @@ const onPlaylistEnter = function (nextRouterState) {
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router history={hashHistory}>
+    <Router history={browserHistory}>
       <Route path="/" component={App} onEnter={onAppEnter}>
+        <Route path="/stations" component={StationsContainer} onEnter={onStationsEnter}/>
         <Route path="/albums" component={AlbumsContainer}/>
         <Route path="/albums/:albumId" component={AlbumContainer} onEnter={onAlbumEnter}/>
-        <Route path="/stations" component={Stations} />
         <Route path="/artists" component={FilterableArtistsContainer}/>
         <Route path="/artists/:artistId" component={ArtistContainer} onEnter={onArtistEnter}>
           <Route path="albums" component={Albums}/>
